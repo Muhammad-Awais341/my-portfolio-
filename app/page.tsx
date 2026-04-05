@@ -27,7 +27,6 @@ export default function Home() {
       ],
       result:
         "Demonstrates product thinking, structured architecture, database integration, and secure application design.",
-      links: ["Live", "GitHub"],
       tags: ["Next.js", "TypeScript", "Tailwind", "Supabase", "RLS"],
     },
     {
@@ -43,7 +42,6 @@ export default function Home() {
       ],
       result:
         "Functional MVP showcasing user-friendly design and structured frontend architecture.",
-      links: ["Live", "GitHub"],
       tags: ["Next.js", "TypeScript", "Supabase", "UX"],
     },
     {
@@ -59,7 +57,6 @@ export default function Home() {
       ],
       result:
         "Highlights teamwork, frontend structure, and collaborative development workflow.",
-      links: ["Live", "GitHub"],
       tags: ["React", "TypeScript", "Teamwork", "GitHub"],
     },
     {
@@ -75,7 +72,6 @@ export default function Home() {
       ],
       result:
         "Delivered a simple and user-friendly concept grounded in UX principles.",
-      links: ["Figma"],
       tags: ["Figma", "UX/UI", "Wireframing", "User Flows"],
     },
   ];
@@ -227,18 +223,6 @@ export default function Home() {
                   >
                     {tag}
                   </span>
-                ))}
-              </div>
-
-              <div className="flex gap-4 text-sm font-medium">
-                {project.links.map((link) => (
-                  <a
-                    key={link}
-                    href="#"
-                    className="underline underline-offset-4 hover:text-gray-600"
-                  >
-                    {link}
-                  </a>
                 ))}
               </div>
             </article>
