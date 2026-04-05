@@ -325,7 +325,7 @@ export default function Home() {
 <section id="contact" className="text-center pt-16 pb-12">
   <h2 className="text-3xl font-semibold mb-4">Contact</h2>
   <p className="text-gray-600 mb-8">
-    Dedicated to real-world frontend solutions. Let's connect and create something amazing together!
+    Dedicated to real-world frontend solutions. Let&#39;s connect and create something amazing together!
   </p>
 
   <div className="flex justify-center gap-12 text-gray-700">
