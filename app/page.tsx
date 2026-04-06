@@ -309,7 +309,7 @@ export default function Home() {
 <section id="contact" className="text-center pt-16 pb-12">
   <h2 className="text-3xl font-semibold mb-4">Contact</h2>
   <p className="text-gray-600 mb-8">
-    Dedicated to real-world frontend solutions. Let&#39;s connect and create something amazing together!
+    Open to frontend roles and collaboration opportunities.
   </p>
 
   <div className="flex justify-center gap-12 text-gray-700">
