@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   SiHtml5,
   SiCss,
@@ -12,6 +15,65 @@ import {
 } from "react-icons/si";
 
 export default function Home() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setErrorMessage("");
+
+    try {
+      // Send directly to Web3Forms from client side (required for free plan)
+      const formDataToSend = new FormData();
+      formDataToSend.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY || "");
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("message", formData.message);
+      formDataToSend.append("subject", `New message from ${formData.name} - Portfolio Contact Form`);
+
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+        setTimeout(() => setSubmitStatus("idle"), 5000);
+      } else {
+        setSubmitStatus("error");
+        setErrorMessage(data.message || "Failed to send message. Please try again.");
+        setTimeout(() => setSubmitStatus("idle"), 5000);
+      }
+    } catch (err) {
+      setSubmitStatus("error");
+      setErrorMessage("Network error. Please check your connection and try again.");
+      console.error("Form submission error:", err);
+      setTimeout(() => setSubmitStatus("idle"), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const projects = [
     {
       title: "Mini ATS",
@@ -74,26 +136,6 @@ export default function Home() {
         "Delivered a simple and user-friendly concept grounded in UX principles.",
       tags: ["Figma", "UX/UI", "Wireframing", "User Flows"],
     },
-  ];
-
-  const skills = [
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Next.js",
-    "Tailwind CSS",
-    "WordPress",
-    "Figma",
-    "Git/GitHub",
-  ];
-
-  const services = [
-    "Frontend development",
-    "Landing pages",
-    "Small business websites",
-    "WordPress updates",
   ];
 
   return (
@@ -306,50 +348,136 @@ export default function Home() {
 </section>
 
   {/* CONTACT */}
-<section id="contact" className="text-center pt-16 pb-12">
-  <h2 className="text-3xl font-semibold mb-4">Contact</h2>
-  <p className="text-gray-600 mb-8">
-    Open to frontend roles and collaboration opportunities.
-  </p>
+<section id="contact" className="pt-16 pb-12 max-w-2xl mx-auto">
+  <div className="text-center mb-10">
+    <h2 className="text-3xl font-semibold mb-4">Contact</h2>
+    <p className="text-gray-600">
+      Open to frontend roles and collaboration opportunities. Send me a message and I&apos;ll get back to you soon.
+    </p>
+  </div>
 
-  <div className="flex justify-center gap-12 text-gray-700">
-    <a
-      href="mailto:awais.devops1@gmail.com"
-      aria-label="Email"
-      className="hover:scale-110 hover:text-black transition"
-    >
-      {/* Email SVG */}
-      <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="m22 7-10 6L2 7" />
-      </svg>
-    </a>
+  {/* Contact Form */}
+  <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-200 p-8 mb-10">
+    <div className="space-y-5">
+      {/* Name Input */}
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+          Name
+        </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+          required
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+          placeholder="Your name"
+        />
+      </div>
 
-    <a
-      href="https://github.com/Muhammad-Awais341"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="GitHub"
-      className="hover:scale-110 hover:text-black transition"
-    >
-      {/* GitHub SVG */}
-      <svg width="28" height="28" fill="currentColor">
-        <path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.72.08-.72 1.2.09 1.84 1.24 1.84 1.24 1.08 1.83 2.82 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.67-.3-5.47-1.32-5.47-5.9 0-1.3.47-2.36 1.24-3.2-.12-.3-.54-1.5.12-3.13 0 0 1.01-.32 3.3 1.22a11.5 11.5 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.63.24 2.83.12 3.13.77.84 1.23 1.9 1.23 3.2 0 4.59-2.8 5.6-5.48 5.89.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58A12 12 0 0 0 12 .5Z" />
-      </svg>
-    </a>
+      {/* Email Input */}
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition"
+          placeholder="your.email@example.com"
+        />
+      </div>
 
-    <a
-      href="https://www.linkedin.com/in/muhammad-awais-60961b1b8/"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="LinkedIn"
-      className="hover:scale-110 hover:text-black transition"
-    >
-      {/* LinkedIn SVG */}
-      <svg width="28" height="28" fill="currentColor">
-        <path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6S0 4.88 0 3.5 1.12 1 2.48 1s2.5 1.12 2.5 2.5ZM.5 8h4V24h-4V8Zm7 0h3.83v2.18h.05c.53-1 1.84-2.18 3.8-2.18 4.06 0 4.82 2.67 4.82 6.14V24h-4v-7.03c0-1.68-.03-3.84-2.34-3.84-2.35 0-2.71 1.83-2.71 3.72V24h-4V8Z" />
-      </svg>
-    </a>
+      {/* Message Textarea */}
+      <div>
+        <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+          Message
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          value={formData.message}
+          onChange={handleInputChange}
+          required
+          rows={5}
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition resize-none"
+          placeholder="Tell me about your project or opportunity..."
+        ></textarea>
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full px-6 py-3 rounded-lg bg-black text-white font-medium hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300"
+      >
+        {isSubmitting ? "Sending..." : "Send Message"}
+      </button>
+
+      {/* Status Messages */}
+      {submitStatus === "success" && (
+        <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700">
+          ✓ Message sent successfully! I&apos;ll get back to you soon.
+        </div>
+      )}
+      {submitStatus === "error" && (
+        <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
+          <p className="font-medium mb-1">✕ {errorMessage || "Something went wrong. Please try again or email me directly."}</p>
+          {!errorMessage && (
+            <p className="text-sm">Email: <a href="mailto:awais.devops1@gmail.com" className="underline font-medium">awais.devops1@gmail.com</a></p>
+          )}
+        </div>
+      )}
+    </div>
+  </form>
+
+  {/* Social Links */}
+  <div className="text-center">
+    <p className="text-sm text-gray-600 mb-6">Or reach me directly through:</p>
+    <div className="flex justify-center gap-8 text-gray-700">
+      <a
+        href="mailto:awais.devops1@gmail.com"
+        aria-label="Email"
+        className="hover:scale-110 hover:text-black transition"
+      >
+        {/* Email SVG */}
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-10 6L2 7" />
+        </svg>
+      </a>
+
+      <a
+        href="https://github.com/Muhammad-Awais341"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub"
+        className="hover:scale-110 hover:text-black transition"
+      >
+        {/* GitHub SVG */}
+        <svg width="28" height="28" fill="currentColor">
+          <path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.72.08-.72 1.2.09 1.84 1.24 1.84 1.24 1.08 1.83 2.82 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.67-.3-5.47-1.32-5.47-5.9 0-1.3.47-2.36 1.24-3.2-.12-.3-.54-1.5.12-3.13 0 0 1.01-.32 3.3 1.22a11.5 11.5 0 0 1 6 0c2.28-1.54 3.29-1.22 3.29-1.22.66 1.63.24 2.83.12 3.13.77.84 1.23 1.9 1.23 3.2 0 4.59-2.8 5.6-5.48 5.89.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.83.58A12 12 0 0 0 12 .5Z" />
+        </svg>
+      </a>
+
+      <a
+        href="https://www.linkedin.com/in/muhammad-awais-60961b1b8/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="LinkedIn"
+        className="hover:scale-110 hover:text-black transition"
+      >
+        {/* LinkedIn SVG */}
+        <svg width="28" height="28" fill="currentColor">
+          <path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6S0 4.88 0 3.5 1.12 1 2.48 1s2.5 1.12 2.5 2.5ZM.5 8h4V24h-4V8Zm7 0h3.83v2.18h.05c.53-1 1.84-2.18 3.8-2.18 4.06 0 4.82 2.67 4.82 6.14V24h-4v-7.03c0-1.68-.03-3.84-2.34-3.84-2.35 0-2.71 1.83-2.71 3.72V24h-4V8Z" />
+        </svg>
+      </a>
+    </div>
   </div>
 </section>
 {/* FOOTER */}
