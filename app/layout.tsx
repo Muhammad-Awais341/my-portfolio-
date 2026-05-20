@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Muhammad Awais | Frontend Developer",
   description:
     "Frontend Developer building scalable web applications with React, TypeScript, and Next.js.",
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
